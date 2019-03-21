@@ -1,0 +1,65 @@
+---
+title: "mzir"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview
+
+`mzir` is an R package for plotting datasets from the Mach-Zehnder interferometric chemical sensor project.  Datasets are structured file folders in the following format:
+
+```
+dataset/            # Folder name is unimportant
+  meta.json         # Stores metadata (chip ID, film ID, notes, etc.)
+  intervals.csv     # Stores intervals data (time vs concentration)
+  data.csv          # Raw interferometer output (time vs phase shift)
+```
+
+Data analysis consists of the following steps:
+
+  #. Load and validate the dataset
+  #. Adjust the intervals
+  #. Align the intervals
+  #. Fit the data within each interval to a model
+  #. Sensitivity analysis
+  #. Save processed results and plots
+  
+
+## Usage
+
+`mzir` can be run in an interactive mode where it walks the user through the data analysis process, or as a regular R library.
+
+
+## Tickets
+
+- [x] create an `interval` class.
+- [ ] create an `intervals` class.  This is a data frame that supports `nextElem.intervals()`.
+- [ ] create a `dataset` class.  The dataset should have `data(dataset)` and `intervals(dataset)`.
+- [ ] create `plot_interval(interval)`.
+- [ ] create live-adjustable plots.
+- [ ] create `fit_interval(interval)`
+
+## GitHub Documents
+
+This is an R Markdown format used for publishing markdown documents to GitHub. When you click the **Knit** button all R code chunks are run and a markdown file (.md) suitable for publishing to GitHub is generated.
+
+## Including Code
+
+You can include R code in the document as follows:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

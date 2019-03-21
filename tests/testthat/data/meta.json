@@ -1,0 +1,25 @@
+{
+	"author": "True Merrill",
+	"date": "2019-03-11",
+	"notes": "Enter any specific notes about this dataset.  You can enter any human-readable text.  Be sure not to use a newline character '\n' since JSON will interpret this as a new lines.",
+	"chip": {
+		"chipId": "0:3:12",
+		"chipLot": 0,
+		"chipWafer": 3,
+		"channels": [
+			{
+				"channel": "ch0",
+				"film": "dithianeMonoLayer"
+			},
+			{
+				"channel": "ch1",
+				"film": "dithianeMonoLayer"
+			},
+			{
+				"channel": "ch2",
+				"film": "bare",
+				"thickness": 0.0
+			}
+		]
+	}
+}
