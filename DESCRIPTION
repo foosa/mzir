@@ -1,13 +1,15 @@
 Package: mzir
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Mach-Zehnder Interferometer Analysis Tools
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Author: True Merrill
+Maintainer: True Merrill <true.merrill@gtri.gatech.edu>
+Description: mzir is an R package for off-line analysis of data sets from the
+    Mach-Zehnder interferometric chemical sensor.
+License: MIT
 Encoding: UTF-8
 LazyData: true
+Imports:
+    ggplot2
 Suggests: 
     testthat

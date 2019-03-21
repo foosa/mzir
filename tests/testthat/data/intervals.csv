@@ -1,4 +1,4 @@
-timeStart,timeStop,dithiane,otherChemical,
-26,130,0,0,
-150,500,20,0,
-500,700,0,0,
+time_start,time_stop,tnt,rdx
+26,130,0,0
+150,500,20,0
+500,700,0,0

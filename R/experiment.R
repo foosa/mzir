@@ -26,8 +26,8 @@ new_experiment <- function(df, ivl_df = NULL, time = NULL) {
   ivls <- list()
   if (is.data.frame(ivl_df)) {
     for (row_index in 1:nrow(ivl_df)) {
-      ivls <- append(ivls,
-                     new_interval_from_row(df, ivl_df, row_index, time = time))
+      ivl <- new_interval_from_row(df, ivl_df, row_index, time = time)
+      ivls[[row_index]] <- ivl
     }
   }
 
@@ -64,12 +64,13 @@ add_interval <- function(ex,
                          time_start = NULL,
                          time_stop = NULL,
                          concentrations = c()) {
+  idx <- length(intervals(ex)) + 1
   ivl <- new_interval(data_frame(ex),
                       time = time,
                       time_start = time_start,
                       time_stop = time_stop,
                       concentrations = concentrations)
-  ex$ivls <- append(ex$ivls, ivl)
+  ex$ivls[[idx]] <- ivl
   ex
 }
 
@@ -80,7 +81,7 @@ add_interval <- function(ex,
 #' @return experiment object
 #'
 delete_interval <- function(ex, interval_index) {
-  ex$ivls[interval_index] <- NULL
+  ex$ivls[[interval_index]] <- NULL
   ex
 }
 

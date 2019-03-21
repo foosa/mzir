@@ -28,20 +28,20 @@
 #' @return interval object
 #'
 new_interval <- function(df,
-						             time = NULL,
-						             time_start = NULL,
-						             time_stop = NULL,
-						             concentrations = numeric()) {
+												 time = NULL,
+												 time_start = NULL,
+												 time_stop = NULL,
+												 concentrations = numeric()) {
 
   # Get the `time` column name as a string
   if (is.null(time)) {
 		time_name <- colnames(df)[1]
 	} else {
-	  if (is.symbol(time)) {
-	    time_name <- deparse(substitute(time))
-	  } else {
-	    time_name <- as.character(time)
-	  }
+		if (is.symbol(time)) {
+			time_name <- deparse(substitute(time))
+		} else {
+			time_name <- as.character(time)
+		}
 	}
 
   time <- df[[time_name]]
@@ -107,9 +107,9 @@ new_interval_from_row <- function(df, ivl_df, row_index, time = NULL) {
   # Construct the new interval
   new_interval(df,
                time = time,
-						   time_start = t_start,
-						   time_stop = t_stop,
-						   concentrations = analytes_vector)
+							 time_start = t_start,
+							 time_stop = t_stop,
+							 concentrations = analytes_vector)
 }
 
 # --- Getters for the interval class ---
@@ -205,32 +205,34 @@ dependent <- function(ivl, as_symbol = FALSE) {
 #' `time_start`.
 #'
 #' @param ivl interval object
-#' @return baseline vector
+#' @return baseline named vector
 #'
 baseline <- function(ivl) {
-  values <- c()
   idx <- match(time_start(ivl), time(ivl))
   df <- data_frame(ivl)
 
   # Extract the initial values at the start time
-  for (col_name in dependent(ivl)) {
+  values <- c()
+	for (col_name in dependent(ivl)) {
     values <- c(values, df[[idx, col_name]])
   }
-  values
+
+	# Create a named vector
+  values <- structure(values, names = dependent(ivl))
+	values
 }
 
 #' Recenters the data around a set of means for each channel
 #'
 #' @param ivl interval object
-#' @param means vector of means
+#' @param means named vector of means
 #' @return ivl
 #'
 center <- function(ivl, means = baseline(ivl)) {
-  col_names <- colnames(data_frame(ivl))
-  for (idx in length(means)) {
-    col_name <- col_names[idx]
-    ivl$df[[idx, col_name]] <- ivl$df[[idx, col_name]] - means[idx]
-  }
+  df <- data_frame(ivl)
+	for (colname in names(means)) {
+		ivl$df[ , colname] <- ivl$df[ , colname] - means[colname]
+	}
   ivl
 }
 
