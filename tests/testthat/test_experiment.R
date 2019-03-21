@@ -48,3 +48,17 @@ test_that("Experiments can add and delete intervals", {
   ex <- delete_interval(ex, 1)
   expect_length(intervals(ex), 0)
 })
+
+test_that("Pipes work for experiment operations", {
+  df <- read.csv("data/data.csv")
+  ex <- new_experiment(df)
+
+  ex <- ex %>%
+    add_interval(time_start = 1, time_stop = 2) %>%
+    add_interval(time_start = 2, time_stop = 3) %>%
+    add_interval(time_start = 3, time_stop = 4) %>%
+    add_interval(time_start = 4, time_stop = 5) %>%
+    add_interval(time_start = 5, time_stop = 6)
+
+  expect_length(intervals(ex), 5)
+})

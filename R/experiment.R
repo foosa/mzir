@@ -63,7 +63,7 @@ add_interval <- function(ex,
                          time = NULL,
                          time_start = NULL,
                          time_stop = NULL,
-                         concentrations = c()) {
+                         concentrations = numeric()) {
   idx <- length(intervals(ex)) + 1
   ivl <- new_interval(data_frame(ex),
                       time = time,
