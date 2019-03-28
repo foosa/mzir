@@ -1,7 +1,7 @@
 #' ---
-#' @file: interact.R
-#' @author: True Merrill
-#' @date: March 19 2019
+#' @file interact.R
+#' @author True Merrill
+#' @date March 19 2019
 #' ---
 
 #' Interactive prompt to load an experiment

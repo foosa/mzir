@@ -1,7 +1,7 @@
 #' ---
-#' @file: experiment.R
-#' @author: True Merrill
-#' @date: March 20 2019
+#' @file experiment.R
+#' @author True Merrill
+#' @date March 20 2019
 #' ---
 
 
@@ -21,6 +21,8 @@
 #' @param time column containing the independent degree of freedom.  If this is
 #'   unspecified, the first column is assumed to be the independent degree of
 #'   freedom
+#'
+#' @export
 new_experiment <- function(df, ivl_df = NULL, time = NULL) {
   # Create list of intervals
   ivls <- list()
@@ -59,6 +61,9 @@ new_experiment <- function(df, ivl_df = NULL, time = NULL) {
 #'   an empty vector.
 #' @return experiment object
 #'
+#' @export
+#' @importFrom magrittr %>%
+#'
 add_interval <- function(ex,
                          time = NULL,
                          time_start = NULL,
@@ -80,6 +85,7 @@ add_interval <- function(ex,
 #' @param interval_index index of the interval to remove
 #' @return experiment object
 #'
+#' @export
 delete_interval <- function(ex, interval_index) {
   ex$ivls[[interval_index]] <- NULL
   ex
@@ -100,7 +106,6 @@ data_frame.experiment <- function(ex) {
 #'
 #' @param ex experiment object
 #' @return list of interval objects
-#'
 intervals <- function(ex) {
   ex$ivls
 }

@@ -1,7 +1,7 @@
 #' ---
-#' @file: interval.R
-#' @author: True Merrill
-#' @date: March 17 2019
+#' @file interval.R
+#' @author True Merrill
+#' @date March 17 2019
 #' ---
 
 # --- Constructors for the interval class ---
@@ -26,7 +26,7 @@
 #'   an empty vector.
 #'
 #' @return interval object
-#'
+#' @export
 new_interval <- function(df,
 												 time = NULL,
 												 time_start = NULL,
@@ -114,6 +114,7 @@ new_interval_from_row <- function(df, ivl_df, row_index, time = NULL) {
 
 # --- Getters for the interval class ---
 
+#' @export
 data_frame <- function(x, ...) {
   UseMethod("data_frame", x)
 }
@@ -131,7 +132,7 @@ data_frame.interval <- function(ivl) {
 #'
 #' @param ivl interval object
 #' @return time vector
-#'
+#' @export
 time <- function(ivl) {
   data_frame(ivl)[[independent(ivl)]]
 }
@@ -140,7 +141,7 @@ time <- function(ivl) {
 #'
 #' @param ivl interval object
 #' @return start time
-#'
+#' @export
 time_start <- function(ivl) {
   ivl$time_start
 }
@@ -149,7 +150,7 @@ time_start <- function(ivl) {
 #'
 #' @param ivl interval object
 #' @return stop time
-#'
+#' @export
 time_stop <- function(ivl) {
   ivl$time_stop
 }
@@ -158,7 +159,7 @@ time_stop <- function(ivl) {
 #'
 #' @param ivl interval object
 #' @return named num vector of concentrations
-#'
+#' @export
 analytes <- function(ivl) {
   ivl$analytes
 }
@@ -169,7 +170,7 @@ analytes <- function(ivl) {
 #' @param as_symbol logical controlling whether the independent variable should
 #'   be returned as a symbol or a string
 #' @return independent variable
-#'
+#' @export
 independent <- function(ivl, as_symbol = FALSE) {
   value <- NULL
   if (as_symbol) {
@@ -186,7 +187,7 @@ independent <- function(ivl, as_symbol = FALSE) {
 #' @param as_symbol logical controlling whether the dependent vairables should
 #'   be returned as a vector of symbols or strings.
 #' @param vector of dependent variable names
-#'
+#' @export
 dependent <- function(ivl, as_symbol = FALSE) {
   values <- c()
   for (col_name in colnames(data_frame(ivl))) {
@@ -206,7 +207,7 @@ dependent <- function(ivl, as_symbol = FALSE) {
 #'
 #' @param ivl interval object
 #' @return baseline named vector
-#'
+#' @export
 baseline <- function(ivl) {
   idx <- match(time_start(ivl), time(ivl))
   df <- data_frame(ivl)
@@ -227,7 +228,7 @@ baseline <- function(ivl) {
 #' @param ivl interval object
 #' @param means named vector of means
 #' @return ivl
-#'
+#' @export
 center <- function(ivl, means = baseline(ivl)) {
   df <- data_frame(ivl)
 	for (colname in names(means)) {
@@ -240,7 +241,7 @@ center <- function(ivl, means = baseline(ivl)) {
 #'
 #' @param ivl interval object
 #' @return means
-#'
+#' @export
 mean.interval <- function(ivl) {
   mean(data_frame(ivl)[[dependent(ivl)]])
 }
@@ -249,23 +250,26 @@ mean.interval <- function(ivl) {
 #'
 #' @param ivl interval object
 #' @return summary
-#'
+#' @export
 summary.interval <- function(ivl) {
   summary(data_frame(ivl))
 }
 
 # --- Setters for the interval class ---
 
+#' @export
 "time_start<-" <- function(ivl, value) {
   ivl$time_start <- value
   ivl
 }
 
+#' @export
 "time_stop<-" <- function(ivl, value) {
   ivl$time_stop <- value
   ivl
 }
 
+#' @export
 "analytes<-" <- function(ivl, value) {
   if (!is.vector(value, mode = "numeric")) {
     stop(paste("Not a numeric vector:", value))
@@ -331,7 +335,8 @@ summary.interval <- function(ivl) {
 #'   guide line
 #' @param guide.time_stop.padding how much to plot after `time_stop`, measured
 #'   in fractional units of `(time_stop - time_start)`.
-#'
+#' @return plot object
+#' @export
 plot.interval <- function(ivl,
                           dependents = dependent(ivl),
                           mapping = NULL,
