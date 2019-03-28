@@ -361,20 +361,24 @@ plot.interval <- function(ivl,
 
   if (guide.time_start) {
     if (is.null(guide.time_start.mapping)) {
-      guide.time_start.mapping <- ggplot2::aes(xintercept = time_start(ivl),
-                                               colour = "#E69F00")
+      guide.time_start.mapping <- ggplot2::aes(xintercept = time_start(ivl))
     }
     plt <- plt +
-      ggplot2::geom_vline(guide.time_start.mapping, linetype = "dashed")
+      ggplot2::geom_vline(guide.time_start.mapping,
+                          linetype = "dotted",
+                          colour = "black",
+                          alpha = 0.5)
   }
 
   if (guide.time_stop) {
     if (is.null(guide.time_stop.mapping)) {
-      guide.time_stop.mapping <- ggplot2::aes(xintercept = time_stop(ivl),
-                                              colour = "#E69F00")
+      guide.time_stop.mapping <- ggplot2::aes(xintercept = time_stop(ivl))
     }
     plt <- plt +
-      ggplot2::geom_vline(guide.time_stop.mapping, linetype = "dashed")
+      ggplot2::geom_vline(guide.time_stop.mapping,
+                          linetype = "dotted",
+                          colour = "black",
+                          alpha = 0.5)
   }
 
   dt <- time_stop(ivl) - time_start(ivl)
@@ -384,6 +388,7 @@ plot.interval <- function(ivl,
   plt <- plt +
     ggplot2::coord_cartesian(xlim = c(t1, t2)) +
     ggplot2::xlab("Time (sec)") +
-    ggplot2::ylab("Phase (rad)")
+    ggplot2::ylab("Phase (rad)") +
+    ggplot2::theme_classic()
   plt
 }

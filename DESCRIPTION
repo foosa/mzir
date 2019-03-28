@@ -6,7 +6,7 @@ Author: True Merrill
 Maintainer: True Merrill <true.merrill@gtri.gatech.edu>
 Description: mzir is an R package for off-line analysis of data sets from the
     Mach-Zehnder interferometric chemical sensor.
-License: MIT
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports:
