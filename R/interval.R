@@ -123,7 +123,7 @@ data_frame <- function(x, ...) {
 #'
 #' @param ivl interval object
 #' @return attached data frame
-#'
+#' @export
 data_frame.interval <- function(ivl) {
   ivl$df
 }
@@ -186,7 +186,7 @@ independent <- function(ivl, as_symbol = FALSE) {
 #' @param ivl interval object
 #' @param as_symbol logical controlling whether the dependent vairables should
 #'   be returned as a vector of symbols or strings.
-#' @param vector of dependent variable names
+#' @return vector of dependent variable names
 #' @export
 dependent <- function(ivl, as_symbol = FALSE) {
   values <- c()
@@ -227,7 +227,7 @@ baseline <- function(ivl) {
 #'
 #' @param ivl interval object
 #' @param means named vector of means
-#' @return ivl
+#' @return interval object
 #' @export
 center <- function(ivl, means = baseline(ivl)) {
   df <- data_frame(ivl)
@@ -252,7 +252,47 @@ mean.interval <- function(ivl) {
 #' @return summary
 #' @export
 summary.interval <- function(ivl) {
-  summary(data_frame(ivl))
+  smry <- coef(ivl) %>%
+    dplyr::mutate(time_start = time_start(ivl)) %>%
+    dplyr::mutate(time_stop = time_stop(ivl)) %>%
+    dplyr::select(time_start, time_stop, dplyr::everything())
+  smry
+}
+
+# Generic
+#' @export
+chop <- function(x, ...) {
+  UseMethod("chop", x)
+}
+
+#' @export
+chop.data.frame <- function(df,
+                            time = df[ , 1],
+                            time_start = time[1],
+                            time_stop = time[length(time)]) {
+  mask <- ((time >= time_start) & (time <= time_stop))
+  df[mask, ]
+}
+
+#' Chop the interval's data frame to include only data between `time_start` and
+#' `time_stop`
+#'
+#' @param ivl interval object
+#' @param time
+#' @param time_start
+#' @param time_stop
+#' @return interval object
+#' @export
+chop.interval <- function(ivl,
+                          time = NULL,
+                          time_start = NULL,
+                          time_stop = NULL) {
+  if (is.null(time)) time <- time(ivl)
+  if (is.null(time_start)) time_start <- time_start(ivl)
+  if (is.null(time_stop)) time_stop <- time_stop(ivl)
+  mask <- ((time >= time_start) & (time <= time_stop))
+  ivl$df <- data_frame(ivl)[mask, ]
+  ivl
 }
 
 # --- Setters for the interval class ---
@@ -287,30 +327,87 @@ summary.interval <- function(ivl) {
 
 # --- Fitting ---
 
-#' #' Fit an interval to a non-linear model
-#' #'
-#' #' @note In the default implementation, we fit to the model
-#' #'   \deqn{
-#' #'     y(t) = (y_0 - y_1) exp(-t/T) + y_1
-#' #'   }
-#' #'
-#' #'   This describes a simple exponential decay at a rate constant `T`.  Several
-#' #'   observables in the MZI experiment that I wish to study can be modeled with
-#' #'   exponential functions.  Please feel free to replace the model to whatever
-#' #'   you wish ...
-#' #'
-#' #' @param ivl interval object to fit
-#' #' @param mdl model object.  Usually created with `nls`.
-#' #' @return ivl
-#' #'
-#' fit <- function(ivl,
-#'                 mdl = nls(y ~ SSasymp(t, y1, y0, log_alpha),
-#'                           data = data_frame(ivl))) {
-#'   ivl$fit <- mdl
-#'   ivl
-#' }
+#' Fit an interval to a non-linear model
+#'
+#' @note In the default implementation, we fit to the model
+#'   \deqn{
+#'     y(t) = (y_0 - y_1) exp(-t/T) + y_1
+#'   }
+#'
+#'   This describes a simple exponential decay at a rate constant `T`.  Several
+#'   observables in the MZI experiment that I wish to study can be modeled with
+#'   exponential functions.  Please feel free to replace the model to whatever
+#'   you wish ...
+#'
+#' @param ivl interval object to fit
+#' @return interval object
+#' @export
+fit <- function(ivl) {
+  models <- list()
+  chopped_ivl <- chop(ivl)
+  for (colname in dependent(ivl)) {
+    t <- time(chopped_ivl)
+    y <- chopped_ivl$df[ , colname]
+    mdl <- NULL
+    result <- tryCatch({
+      mdl <- nls(y ~ SSasymp(t, y1, y0, log_alpha))
+    }, error = function(e) {
+      warning(e)
+    })
+
+    models[[colname]] <- mdl
+  }
+
+  ivl$fit <- models
+  ivl
+}
+
+#' @export
+is_fit <- function(ivl) {
+  !(is.null(ivl$fit))
+}
+
+#' @export
+coef.interval <- function(ivl, dependents = dependent(ivl)) {
+  if (!(is_fit(ivl))) {
+    ivl <- fit(ivl)
+  }
+
+  coeffs <- data.frame()
+  for (colname in dependents) {
+    if (!(is.null(ivl$fit[[colname]]))) {
+      col_summary <- summary(ivl$fit[[colname]])
+      col_coeffs <- as.data.frame(col_summary$coefficients)
+
+      tmp <- data.frame(param = rownames(col_coeffs),
+                        dependent = colname)
+      rownames(col_coeffs) <- NULL
+      tmp <- cbind(tmp, col_coeffs)
+      coeffs <- rbind(coeffs, tmp)
+    }
+  }
+
+  coeffs
+}
 
 # --- Plotting ---
+
+
+# StatInterval <- ggplot2::ggproto("StatInterval", Stat,
+#   compute_group = function(data, scales) {
+#     chopped_data <- chop(data)
+#     x <- chopped_data$x
+#     y <- chopped_data$y
+#     result <- tryCatch({
+#       mdl <- nls(y ~ SSasymp(t, y1, y0, log_alpha))
+#     }, error = function(e) {
+#       warning(e)
+#       mdl <- NULL
+#     })
+#   }
+# )
+
+
 
 #' Plot the interval
 #'
@@ -353,6 +450,9 @@ plot.interval <- function(ivl,
     mapping <- ggplot2::aes_string(x = independent(ivl))
   }
 
+  # Chop
+  chopped_ivl <- chop(ivl)
+
   # Create plot object
   plt <- ggplot2::ggplot(data_frame(ivl), mapping)
   idx <- 0
@@ -361,7 +461,25 @@ plot.interval <- function(ivl,
     col_color <- line.colours[idx]
     col_mapping <- ggplot2::aes_string(y = col_name)
     plt <- plt +
-      ggplot2::geom_line(col_mapping, colour = col_color)
+      ggplot2::geom_line(col_mapping, colour = col_color, alpha = 0.5)
+
+    if (is_fit(ivl)) {
+       mdl <- ivl$fit[[col_name]]
+       if (!(is.null(mdl))) {
+         tmp <- data.frame(
+           t = time(chopped_ivl),
+           y = predict(mdl)
+         )
+         plt <- plt +
+           ggplot2::geom_line(
+             mapping = ggplot2::aes(x = t, y = y),
+             data = tmp,
+             show.legend = FALSE,
+             colour = col_color,
+             size = 1
+           )
+       }
+    }
   }
 
   if (guide.time_start) {
@@ -389,9 +507,14 @@ plot.interval <- function(ivl,
   dt <- time_stop(ivl) - time_start(ivl)
   t1 <- time_start(ivl) - guide.time_start.padding * dt
   t2 <- time_stop(ivl) + guide.time_stop.padding * dt
+  y1 <- data_frame(chopped_ivl) %>%
+    dplyr::select(dependents) %>% min
+  y2 <- data_frame(chopped_ivl) %>%
+    dplyr::select(dependents) %>% max
 
   plt <- plt +
-    ggplot2::coord_cartesian(xlim = c(t1, t2)) +
+    ggplot2::coord_cartesian(xlim = c(t1, t2),
+                             ylim = c(y1, y2)) +
     ggplot2::xlab("Time (sec)") +
     ggplot2::ylab("Phase (rad)") +
     ggplot2::theme_classic()

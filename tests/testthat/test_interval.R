@@ -45,6 +45,26 @@ test_that("Intervals have setter methods", {
 	expect_equal(analytes(ivl), c(tnt = 0, rdx = 10))
 })
 
+test_that("Intervals can be fitted", {
+  df <- read.csv("data/data.csv")
+  ivl <- new_interval(df)
+  time_start(ivl) <- 26
+  time_stop(ivl) <- 130
+
+  expect_false(is_fit(ivl))
+  ivl <- fit(ivl)
+  expect_true(is_fit(ivl))
+
+  plt <- plot(ivl)
+  ggplot2::ggsave("test_interval_fitted.png",
+                  plot = plt,
+                  width = 4,
+                  height = 3,
+                  units = "in")
+
+  print(coef(ivl))
+})
+
 test_that("Intervals can be centered", {
 	df <- read.csv("data/data.csv")
 	ivl <- new_interval(df)

@@ -110,12 +110,22 @@ intervals <- function(ex) {
   ex$ivls
 }
 
-write_experiment <- function(ex, directory = getwd()) {
-  write.csv(data_frame(ex),
-            file = file.path(directory, "data.csv"))
-
-  ivl_df <- data.frame(
-    time_start <- numeric(),
-    time_stop <- numeric(),
-  )
+#' @export
+summary.experiment <- function(ex) {
+  smry <- data.frame()
+  for (ivl in intervals(ex)) {
+    smry <- smry %>%
+      dplyr::bind_rows(summary(ivl))
+  }
+  smry
 }
+
+# write_experiment <- function(ex, directory = getwd()) {
+#   write.csv(data_frame(ex),
+#             file = file.path(directory, "data.csv"))
+#
+#   ivl_df <- data.frame(
+#     time_start <- numeric(),
+#     time_stop <- numeric(),
+#   )
+# }
